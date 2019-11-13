@@ -153,9 +153,9 @@
                     });
                 },
                 async getContacts(id = '') {
-                    let url = 'http://contatosapi.azurewebsites.net/api/contatos';
+                    let url = 'https://contatosapi.azurewebsites.net/api/contatos';
                     if (id !== '') {
-                        url = 'http://contatosapi.azurewebsites.net/api/contatos/' + id;
+                        url = 'https://contatosapi.azurewebsites.net/api/contatos/' + id;
                     }
                     try {
                         await axios.get(url, {
