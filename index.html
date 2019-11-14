@@ -9,93 +9,132 @@
 
     <link type="text/css" rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
     <link type="text/css" rel="stylesheet" href="css/fontawesome/css/all.min.css">
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="bg-secondary">
-    <div class="container" id="app">
+    <div class="container-fluid" id="app">
         <div class="row">
             <div class="col-md-8 offset-md-2">
                 <div class="card mt-2">
-                    <div class="card-body">
-                        <form action="">
-                            <h3>Contatos</h3>
-                            <div class="form-group">
-                                <label for="">Nome:</label>
-                                <input type="text" class="form-control form-control-sm" placeholder="Nome"
-                                    v-model="contact.nome">
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="">Telefone:</label>
-                                    <div class="input-group input-group-sm mb-3">
-                                        <input type="text" class="form-control" placeholder="Telefone"
-                                            v-model="telefone" aria-label="Telefone" aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button @click="addTelefone" class="btn btn-primary" type="button"> <i
-                                                    class="fas fa-plus"></i>
-                                            </button>
+                    <div class="card-content" v-cloak>
+                        <form action="" @submit.prevent="saveContact()">
+                            <div class="card-body">
+                                <h3>{{(contact.id.length != 0)? 'Editar ':'' }}Contatos</h3>
+                                <div class="alert alert-danger" role="alert" v-if="showError">
+                                    {{errorMessage}}
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Nome:</label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="Nome"
+                                        v-model="contact.nome">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="">Telefone:</label>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input type="text" class="form-control" placeholder="Telefone"
+                                                v-model="telefone" aria-label="Telefone"
+                                                aria-describedby="basic-addon2">
+                                            <div class="input-group-append">
+                                                <button @click="addTelefone" class="btn btn-primary" type="button"> <i
+                                                        class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="">E-mail:</label>
+                                        <div class="input-group input-group-sm mb-3">
+                                            <input type="email" class="form-control" placeholder="E-mail"
+                                                aria-label="E-mail" aria-describedby="basic-addon2" v-model="email">
+                                            <div class="input-group-append">
+                                                <button @click="addEmail" class="btn btn-primary" type="button"> <i
+                                                        class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="">E-mail:</label>
-                                    <div class="input-group input-group-sm mb-3">
-                                        <input type="email" class="form-control" placeholder="E-mail"
-                                            aria-label="E-mail" aria-describedby="basic-addon2" v-model="email">
-                                        <div class="input-group-append">
-                                            <button @click="addEmail" class="btn btn-primary" type="button"> <i
-                                                    class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <table class="table table-sm text-center">
+                                            <tr v-for="tel in contact.telefones">
+                                                <td>{{tel.numero}}</td>
+                                                <td><button class="btn btn-sm btn-danger" type="button"
+                                                        @click="removeTelefone(tel.numero)"><i
+                                                            class="fas fa-times"></i></button></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-sm text-center">
+                                            <tr v-for="email in contact.emails">
+                                                <td>{{email.endereco}}</td>
+                                                <td><button class="btn btn-sm btn-danger" type="button"
+                                                        @click="removeEmail(email.endereco)"><i
+                                                            class="fas fa-times"></i></button></td>
+                                            </tr>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <table class="table table-sm text-center">
-                                        <tr v-for="tel in contact.telefones">
-                                            <td>{{tel.numero}}</td>
-                                            <td><button class="btn btn-sm btn-danger" type="button"
-                                                    @click="removeTelefone(tel.numero)"><i
-                                                        class="fas fa-times"></i></button></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="col-md-6">
-                                    <table class="table table-sm text-center">
-                                        <tr v-for="email in contact.emails">
-                                            <td>{{email.endereco}}</td>
-                                            <td><button class="btn btn-sm btn-danger" type="button"
-                                                    @click="removeTelefone(email.numero)"><i
-                                                        class="fas fa-times"></i></button></td>
-                                        </tr>
-                                    </table>
-                                </div>
+                            <div class="card-footer d-flex flex-row-reverse">
+                                <button class="btn btn-sm btn-danger" type="button"
+                                    @click="cancelEdit()">Cancelar</button>
+                                <button 
+                                    class="btn btn-sm mr-2" 
+                                    :class="(contact.id.length != 0)? 'btn-warning ':'btn-primary'"
+                                    type="submit"
+                                >{{(contact.id.length != 0)? 'Editar ':'Adicionar' }}</button>
                             </div>
                         </form>
-                        <div class="row rounded border border-secondary" v-for="con in contacts">
-                            <div class="col-md-4 mt-2">
-                                <p>{{con.nome}}</p>
-                            </div>
-                            <div class="col-md-3 mt-2">
-                                <ul style="list-style-type:none;">
-                                    <li v-for="tel in con.telefones">
-                                        {{tel.numero}}
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-5 mt-2">
-                                <ul style="list-style-type:none;">
-                                    <li v-for="email in con.emails">
-                                        {{email.endereco}}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
                     </div>
-                    <div class="card-footer d-flex flex-row-reverse">
-                        <button class="btn btn-sm btn-danger">Cancelar</button>
-                        <button class="btn btn-sm btn-success mr-2">Adicionar</button>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-sm table-striped table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>Contato</th>
+                                    <th>Telefones</th>
+                                    <th>E-mails</th>
+                                    <th>-</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="con in contacts" v-cloak>
+                                    <td class="align-middle">{{con.nome}}</td>
+                                    <td class="align-middle">
+                                        <ul style="list-style-type:none;">
+                                            <li v-for="tel in con.telefones">
+                                                {{tel.numero}}
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td class="align-middle">
+                                        <ul style="list-style-type:none;">
+                                            <li v-for="email in con.emails">
+                                                {{email.endereco}}
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-sm btn-warning"
+                                            @click="getContacts(con.id)"> <i class="fas fa-edit"></i> </button>
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                            @click="removeContact(con.id)"> <i class="fas fa-trash"></i> </button> </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -107,77 +146,7 @@
     <script type="text/javascript" src="js/vue.js"></script>
     <script type="text/javascript" src="js/bootstrap/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/axios/dist/axios.min.js"></script>
-    <script type="text/javascript">
-        new Vue({
-            el: '#app',
-            data() {
-                return {
-                    email: '',
-                    telefone: '',
-                    contact: {
-                        id: '',
-                        nome: '',
-                        emails: [],
-                        telefones: []
-                    },
-                    contacts: []
-                }
-            },
-            methods: {
-                addTelefone() {
-                    if (this.telefone.length != 0) {
-                        let telefone = {
-                            numero: this.telefone
-                        }
-                        this.contact.telefones.push(telefone);
-                        this.telefone = '';
-                    }
-                },
-                addEmail() {
-                    if (this.email.length != 0) {
-                        let email = {
-                            endereco: this.email
-                        }
-                        this.contact.emails.push(email);
-                        this.email = '';
-                    }
-                },
-                removeEmail(email) {
-                    this.contact.emails.filter(el => {
-                        return el.endereco != email;
-                    });
-                },
-                removeTelefone(numero) {
-                    this.contact.telefones = this.contact.telefones.filter(el => {
-                        return el.numero !== numero;
-                    });
-                },
-                async getContacts(id = '') {
-                    let url = 'https://contatosapi.azurewebsites.net/api/contatos';
-                    if (id !== '') {
-                        url = url+'/' + id;
-                    }
-                    try {
-                        await axios.get(url, {
-                            headers: {
-                                'Access-Control-Allow-Origin': '*',
-                            },
-                        }).then(response => {
-                            this.contacts = response.data;
-                        })
-                    } catch (error) {
-                        console.log(error)
-                    }
-                }
-            },
-            mounted() {
-                if (this.hasOwnProperty('_contact')) {
-                    this._contact = Object.assign({}, this.contact);
-                }
-                this.getContacts();
-            },
-        });
-    </script>
+    <script type="text/javascript" src="js/contatos.js"></script>
 </body>
 
 </html>
